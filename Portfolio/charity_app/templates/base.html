@@ -8,6 +8,44 @@
     <title>{% block title %}{% endblock title %} | Charity App</title>
     <link rel="stylesheet" href={% static 'css/style.css' %}/>
   </head>
+  <body>
+    <header class="header">
+      <nav class="container container--70">
+        <ul class="nav--actions">
+          <li class="logged-user">
+            Witaj Agata
+            <ul class="dropdown">
+              <li><a href="#">Profil</a></li>
+              <li><a href="#">Moje zbiórki</a></li>
+              <li><a href="#">Wyloguj</a></li>
+            </ul>
+          </li>
+          <li><a href="{% url 'Login' %}#login" class="btn btn--small btn--without-border">Zaloguj</a></li>
+          <li><a href="{% url 'Register' %}#register" class="btn btn--small btn--highlighted">Załóż konto</a></li>
+        </ul>
 
-{% block content %}
-{% endblock content %}
+        <ul>
+          <li><a href="/app/" class="btn btn--without-border active">Start</a></li>
+          <li><a href="/app/#steps" class="btn btn--without-border">O co chodzi?</a></li>
+          <li><a href="/app/#about-us" class="btn btn--without-border">O nas</a></li>
+          <li><a href="/app/#help" class="btn btn--without-border">Fundacje i organizacje</a></li>
+          <li><a href="/app/donate/#form-donate" class="btn btn--without-border">Przekaż dary</a></li>
+          <li><a href="/app/#contact" class="btn btn--without-border">Kontakt</a></li>
+        </ul>
+      </nav>
+
+      <div class="slogan container container--90">
+        <div class="slogan--item">
+          <h1>
+            Zacznij pomagać!<br />
+            Oddaj niechciane rzeczy w zaufane ręce
+          </h1>
+        </div>
+      </div>
+    </header>
+    {% block content %}
+    {% endblock content %}
+    {% include 'footer.html' %}
+    <script src={% static 'js/app.js' %}></script>
+  </body>
+</html>

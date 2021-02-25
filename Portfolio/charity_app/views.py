@@ -2,12 +2,13 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import View
 from django.db.models import Count
-from django.contrib.auth import authenticate, get_user_model, login
-from charity_app.models import Donation, Institution
+from django.contrib.auth import authenticate, get_user_model, login, logout
+from django import template
+from charity_app.models import Category, Donation, Institution
 
 User = get_user_model()
+register = template.Library()
 
-# Create your views here.
 class LandingPage(View):
     def get(self, request):
 
@@ -41,8 +42,27 @@ class LandingPage(View):
 
 
 class AddDonation(View):
+
+    @register.filter
+    def get_value_in_qs(queryset, key):
+        return queryset.values(key, flat=True)
+
     def get(self, request):
-        return render(request, 'form.html')
+
+        if request.user.is_authenticated:
+
+            categories = Category.objects.all()
+            organisations = Institution.objects.all().order_by('name')
+            ctx = {
+                "categories": categories,
+                "organisations": organisations
+            }
+
+            return render(request, 'form.html', context=ctx)
+
+        else:
+
+            return redirect('Login')
 
 
 class Login(View):
@@ -62,6 +82,13 @@ class Login(View):
             return redirect('Homepage')
         else:
             return redirect(reverse('Register') + '#register')
+
+
+class Logout(View):
+
+    def get(self, request):
+        logout(request)
+        return redirect('Homepage')
 
 
 class Register(View):

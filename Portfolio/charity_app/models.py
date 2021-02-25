@@ -6,7 +6,13 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=64, unique=True)
+    name = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return self.name
 
 
 class Institution(models.Model):
@@ -16,8 +22,8 @@ class Institution(models.Model):
     (3, 'zbiórka lokalna')
 ]
     name = models.CharField(max_length=64)
+    categories = models.ManyToManyField(Category)
     description = models.TextField()
-    target = models.CharField(max_length=512)
     type = models.IntegerField(choices=INSTITUTION_CHOICES, default=1)
 
 

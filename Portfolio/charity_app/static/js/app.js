@@ -235,6 +235,12 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$step.parentElement.hidden = this.currentStep >= 6;
 
       // TODO: get data from inputs and show them in summary
+      // THIS EXTRACTS CHECKED INPUTS, WE CAN USE THIS TO SHOW ONLY RELEVANT INSTITUTIONS
+      this.$checkedCategories = document.querySelector("div[data-step='1']").querySelectorAll('input:checked')
+      /**
+       * Since we now have selected the input nodes with category IDs, we could compare those with the queryset of related organizations... But how?
+       */
+      
     }
 
     /**

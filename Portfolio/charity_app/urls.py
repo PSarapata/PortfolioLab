@@ -6,5 +6,6 @@ urlpatterns = [
     path('donate/',AddDonation.as_view(), name='Donate'),
     path('login/', Login.as_view(), name='Login'),
     path('logout/', Logout.as_view(), name='Logout'),
-    path('register/', Register.as_view(), name='Register')
+    path('register/', Register.as_view(), name='Register'),
+    # path('ajax/filter', FilterOrgs.as_view(), name='Filter_Orgs')
 ]

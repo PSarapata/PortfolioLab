@@ -1,3 +1,4 @@
+from django.http import response
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import View
@@ -109,3 +110,18 @@ class Register(View):
             return redirect(reverse('Login') + '#login')
         
         return render(request, 'register.html')
+
+
+class AjaxFilter(View):
+    """View for AJAX data exchange, request contains a list of chosen categories, response returns related Institution objects."""
+
+    def post(self, request):
+
+        # This is a list of chosen categories PKs (as strings):
+        category_list = request.data
+
+        # This is the list of organisation PKs being sent along with the response:
+        idList = list(set(Institution.objects.filter(categories__in=category_list).values_list('id', flat=True)))
+        serializer = self.get_serializer(idList, many=True)
+
+        return response(serializer.data)

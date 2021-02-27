@@ -84,7 +84,7 @@
   > .form--steps-container {
     max-width: none;
     padding: 20px 30px 60px;
-    background-image: url(../images/form-bg.jpg);
+    background-image: url("/static/images/form-bg.jpg");
     background-size: cover;
     background-position: center right;
     min-height: 700px;
@@ -167,11 +167,11 @@
             margin-right: 20px;
 
             &-bag {
-              background-image: url(../images/icon-bag.png);
+              background-image: url("/static/images/icon-bag.png");
             }
 
             &-hand {
-              background-image: url(../images/icon-hand.png);
+              background-image: url("/static/images/icon-hand.png");
             }
           }
         }

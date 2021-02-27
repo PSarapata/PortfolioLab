@@ -162,6 +162,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
+
   /**
    * Switching between form steps
    */
@@ -235,12 +236,67 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$step.parentElement.hidden = this.currentStep >= 6;
 
       // TODO: get data from inputs and show them in summary
-      // THIS EXTRACTS CHECKED INPUTS, WE CAN USE THIS TO SHOW ONLY RELEVANT INSTITUTIONS
-      this.$checkedCategories = document.querySelector("div[data-step='1']").querySelectorAll('input:checked')
-      /**
-       * Since we now have selected the input nodes with category IDs, we could compare those with the queryset of related organizations... But how?
+    }
+
+    hideThemInputs(event) {
+
+      event.preventDefault();
+
+      /*
+       * This function is bound to donation form's submit (next) button. Ajax request is sent to an endpoint,
+       * it then checks for orgs with chosen categories and hides the remainder.
        */
+
+      this.$checkedCategories = document.querySelector("div[data-step='1']").querySelectorAll('input:checked');
+      /**
+       * Since we now have selected the input nodes with category IDs, we could compare those with the queryset of related organizations
+       */
+
+      let categories = [];
+
+      this.$checkedCategories.forEach(cat => {
+        categories.push(cat.value);
+      });
+
       
+      let serializedData = $(this).serialize();
+
+      $.ajax({
+        type: 'POST',
+        url: WRITE_URL_HERE,
+        data: serializedData,
+        success: (response) => {
+          // Get ID list from the response:
+          let idList = Array.from(JSON.parse(response["idList"]));
+          let availableOrgs = document.querySelector('div[data-step="3"]').querySelectorAll('input');
+          let orgIDList = [];
+
+          availableOrgs.forEach(org => {
+            orgIDList.push(org.value);
+          });
+
+          // Get a set composed of joint elements from 2 lists
+          const mySet = new Set([
+            ...idList,
+            ...orgIDList
+          ]);
+
+          // Unpack into an Array...
+          const setArr = [...mySet];
+          
+          // Check if the organisation has the chosen categories:
+          // No? --> hide it
+
+          availableOrgs.forEach(org => {
+            if (!setArr.includes(org.value)) {
+              org.classList.add('hidden');
+            }
+          });
+        },
+        error: (response) => {
+          alert(response["responseJSON"]["error"]);
+        }
+      });
     }
 
     /**
@@ -248,12 +304,16 @@ document.addEventListener("DOMContentLoaded", function() {
      *
      * TODO: validation, send data to server
      */
-    submit(e) {
-      e.preventDefault();
-      this.currentStep++;
-      this.updateForm();
-    }
-  }
+  submit(e) {
+    e.preventDefault();
+    this.currentStep++;
+    this.updateForm()
+  };
+}
+
+  const targetButton = document.querySelector('div[data-step="1"]').querySelector('button')
+  targetButton.addEventListener("click", hideThemInputs, once=true)
+  
   const form = document.querySelector(".form--steps");
   if (form !== null) {
     new FormSteps(form);

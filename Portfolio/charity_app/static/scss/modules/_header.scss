@@ -1,6 +1,6 @@
 header {
   &.header--main-page {
-    background-image: url(../images/header-bg.jpg);
+    background-image: url("/static/images/header-bg.jpg");
     background-position: bottom left -30vh;
     background-repeat: no-repeat;
     background-size: 70vw;
@@ -13,7 +13,7 @@ header {
   }
 
   &.header--form-page {
-    background-image: url(../images/header-form-bg.jpg);
+    background-image: url("/static/images/header-form-bg.jpg");
     background-position: top left -500px;
     background-repeat: no-repeat;
     background-size: auto 100%;

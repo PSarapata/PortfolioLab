@@ -74,10 +74,10 @@
           <li>
             <div class="col">
               <div class="title">Fundacja "{{ foundation.name }}"</div>
-              <div class="subtitle">Cel i misja: "{{ foundation.target }}"</div>
+              <div class="subtitle">Cel i misja: "{{ foundation.description }}"</div>
             </div>
 
-            <div class="col"><div class="text">{{ foundation.description }}</div></div>
+            <div class="col"><div class="text">{% for cat in foundation.categories.all %}{{ cat }}, {% endfor %}</div></div>
           </li>
           {% endfor %}
         </ul>
@@ -102,10 +102,10 @@
           <li>
             <div class="col">
               <div class="title">Organizacja: "{{ org.name }}"</div>
-              <div class="subtitle">Cel i misja: "{{ org.target }}"</div>
+              <div class="subtitle">Cel i misja: "{{ org.description }}"</div>
             </div>
 
-            <div class="col"><div class="text">{{ org.description }}</div></div>
+            <div class="col"><div class="text">{% for cat in org.categories.all %}{{ cat }}, {% endfor %}</div></div>
           </li>
           {% endfor %}
         </ul>
@@ -129,10 +129,10 @@
           <li>
             <div class="col">
               <div class="title">Lokalna zbiórka: "{{ fr.name }}"</div>
-              <div class="subtitle">Cel i misja: "{{ fr.target }}"</div>
+              <div class="subtitle">Cel i misja: "{{ fr.description }}"</div>
             </div>
 
-            <div class="col"><div class="text">{{ fr.description }}</div></div>
+            <div class="col"><div class="text">{% for cat in fr.categories.all %}{{ cat }}, {% endfor %}</div></div>
           </li>
           {% endfor %}
         </ul>

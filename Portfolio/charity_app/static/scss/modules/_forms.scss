@@ -67,6 +67,10 @@ form {
         }
       }
 
+      .hidden {
+        display: none;
+      }
+      
       .checkbox {
         padding: 14px;
         border: 1px solid $main-color;

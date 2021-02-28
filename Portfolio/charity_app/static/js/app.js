@@ -263,9 +263,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
       $.ajax({
         type: 'POST',
-        url: WRITE_URL_HERE,
+        url: "http://localhost:8000/app/ajax/filter/",
         data: serializedData,
         success: (response) => {
+          console.log("success", response)
+
           // Get ID list from the response:
           let idList = Array.from(JSON.parse(response["idList"]));
           let availableOrgs = document.querySelector('div[data-step="3"]').querySelectorAll('input');
@@ -311,9 +313,60 @@ document.addEventListener("DOMContentLoaded", function() {
   };
 }
 
+  function hideThemInputs(event) {
+
+    event.preventDefault();
+
+    /*
+    * This function is bound to donation form's submit (next) button. Ajax request is sent to an endpoint,
+    * it then checks for orgs with chosen categories and hides the remainder.
+    */
+
+    this.$checkedCategories = document.querySelector("div[data-step='1']").querySelectorAll('input:checked');
+    /**
+     * Since we now have selected the input nodes with category IDs, we could compare those with the queryset of related organizations
+     */
+
+    let categories = [];
+
+    this.$checkedCategories.forEach(cat => {
+      categories.push(cat.value);
+    });
+
+    /**
+     * We are passing data with POST to a custom Back End endpoint, which allows us to get filtered DB results, which we can then use to hide
+     * stuff dynamically.
+     */
+    $.ajax({
+      type: 'POST',
+      url: "http://localhost:8000/app/ajax/filter/",
+      data: JSON.stringify({"serializedData": categories}),
+      success: (response) => {
+        console.log(response)
+
+        // Get ID list from the response:
+        let resp = JSON.parse(response)
+        let idList = Array.from(resp.idList);
+        let availableOrgs = document.querySelector('div[data-step="3"]').querySelectorAll('input');
+
+        // Check if the organisation has the chosen categories:
+        // No? --> hide it
+
+        availableOrgs.forEach(org => {
+          if (!idList.includes(parseInt(org.value))) {
+            org.parentElement.parentElement.style.display = 'none';
+          }
+        });
+      },
+      error: (response) => {
+        alert(response["responseJSON"]["error"]);
+      }
+    });
+  }
+
   const targetButton = document.querySelector('div[data-step="1"]').querySelector('button')
   targetButton.addEventListener("click", hideThemInputs, once=true)
-  
+
   const form = document.querySelector(".form--steps");
   if (form !== null) {
     new FormSteps(form);

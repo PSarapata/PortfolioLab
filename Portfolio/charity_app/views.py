@@ -1,10 +1,13 @@
-from django.http import response
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import View
 from django.db.models import Count
 from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django import template
+import json
 from charity_app.models import Category, Donation, Institution
 
 User = get_user_model()
@@ -112,16 +115,29 @@ class Register(View):
         return render(request, 'register.html')
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class AjaxFilter(View):
     """View for AJAX data exchange, request contains a list of chosen categories, response returns related Institution objects."""
 
+    # TODO:: DESERIALIZE REQUEST, SERIALIZE RESPONSE
     def post(self, request):
 
+        # Decode request body (bytestring --> string):
+        reqbody = json.loads(request.body.decode())
+        print('#####'*10)
+        print(reqbody)
+        print('#####'*10)
+
         # This is a list of chosen categories PKs (as strings):
-        category_list = request.data
+        category_list = reqbody['serializedData']
+        print('#####'*10)
+        print(category_list, type(category_list))
+        print('#####'*10)
 
         # This is the list of organisation PKs being sent along with the response:
         idList = list(set(Institution.objects.filter(categories__in=category_list).values_list('id', flat=True)))
-        serializer = self.get_serializer(idList, many=True)
 
-        return response(serializer.data)
+        # There is no serializer, so just encode it.
+        response = HttpResponse(json.dumps({"idList": idList}))
+
+        return response

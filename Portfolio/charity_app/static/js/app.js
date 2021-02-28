@@ -238,69 +238,6 @@ document.addEventListener("DOMContentLoaded", function() {
       // TODO: get data from inputs and show them in summary
     }
 
-    hideThemInputs(event) {
-
-      event.preventDefault();
-
-      /*
-       * This function is bound to donation form's submit (next) button. Ajax request is sent to an endpoint,
-       * it then checks for orgs with chosen categories and hides the remainder.
-       */
-
-      this.$checkedCategories = document.querySelector("div[data-step='1']").querySelectorAll('input:checked');
-      /**
-       * Since we now have selected the input nodes with category IDs, we could compare those with the queryset of related organizations
-       */
-
-      let categories = [];
-
-      this.$checkedCategories.forEach(cat => {
-        categories.push(cat.value);
-      });
-
-      
-      let serializedData = $(this).serialize();
-
-      $.ajax({
-        type: 'POST',
-        url: "http://localhost:8000/app/ajax/filter/",
-        data: serializedData,
-        success: (response) => {
-          console.log("success", response)
-
-          // Get ID list from the response:
-          let idList = Array.from(JSON.parse(response["idList"]));
-          let availableOrgs = document.querySelector('div[data-step="3"]').querySelectorAll('input');
-          let orgIDList = [];
-
-          availableOrgs.forEach(org => {
-            orgIDList.push(org.value);
-          });
-
-          // Get a set composed of joint elements from 2 lists
-          const mySet = new Set([
-            ...idList,
-            ...orgIDList
-          ]);
-
-          // Unpack into an Array...
-          const setArr = [...mySet];
-          
-          // Check if the organisation has the chosen categories:
-          // No? --> hide it
-
-          availableOrgs.forEach(org => {
-            if (!setArr.includes(org.value)) {
-              org.classList.add('hidden');
-            }
-          });
-        },
-        error: (response) => {
-          alert(response["responseJSON"]["error"]);
-        }
-      });
-    }
-
     /**
      * Submit form
      *

@@ -1,5 +1,6 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
+from django.core import serializers
 from django.urls import reverse
 from django.views.generic import View
 from django.db.models import Count
@@ -116,10 +117,9 @@ class Register(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AjaxFilter(View):
+class SelectedInstitutionsView(View):
     """View for AJAX data exchange, request contains a list of chosen categories, response returns related Institution objects."""
 
-    # TODO:: DESERIALIZE REQUEST, SERIALIZE RESPONSE
     def post(self, request):
 
         # Decode request body (bytestring --> string):
@@ -135,7 +135,8 @@ class AjaxFilter(View):
         print('#####'*10)
 
         # This is the list of organisation PKs being sent along with the response:
-        idList = list(set(Institution.objects.filter(categories__in=category_list).values_list('id', flat=True)))
+        # IM WIĘCEJ NA BAZIE DANYCH TYM LEPIEJ (SZYBCIEJ)
+        idList = list(Institution.objects.filter(categories__in=category_list).distinct().values_list('id', flat=True))
 
         # There is no serializer, so just encode it.
         response = HttpResponse(json.dumps({"idList": idList}))

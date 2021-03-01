@@ -234,7 +234,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
       this.$stepInstructions[0].parentElement.parentElement.hidden = this.currentStep >= 6;
       this.$step.parentElement.hidden = this.currentStep >= 6;
-
+      document.getElementById('form-donate').scrollIntoView();
       // TODO: get data from inputs and show them in summary
     }
 
@@ -276,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function() {
      */
     $.ajax({
       type: 'POST',
-      url: "http://localhost:8000/app/ajax/filter/",
+      url: "http://localhost:8000/app/ajax/selected-institutions/",
       data: JSON.stringify({"serializedData": categories}),
       success: (response) => {
         console.log(response)
@@ -301,8 +301,61 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
+  // STEP 5 data render
+  function displaySummary(event) {
+
+    event.preventDefault();
+
+    const selectedCategories = document.querySelector("div[data-step='1']").querySelectorAll('input:checked')
+    categoryNames = []
+    selectedCategories.forEach(cat => {
+        const catName = cat.parentElement.querySelector('span.description').innerText
+        categoryNames.push(catName)
+    })
+
+    const qty = document.querySelector('div[data-step="2"]').querySelector('input').value
+    const pasteQtyAndNamesHere = document.getElementById('summ-donation')
+    pasteQtyAndNamesHere.innerText = `${qty} worki ${categoryNames}`
+
+    const address = document.querySelector('input[name="address"]').value
+    const city = document.querySelector('input[name="city"]').value
+    const postcode = document.querySelector('input[name="postcode"]').value
+    const phone = document.querySelector('input[name="phone"]').value
+    const address_data = [address, city, postcode, phone]
+    const claimAddress = document.getElementById('claim-address')
+
+    address_data.forEach(el => {
+      const li = document.createElement('li')
+      li.innerText = el
+      claimAddress.appendChild(li)
+    })
+
+    const date = document.querySelector('input[name="data"]').value
+    const time = document.querySelector('input[name="time"]').value
+    const more_info = document.querySelector('textarea[name="more_info"]').value
+    const time_data = [date, time, more_info]
+    const claimDate = document.getElementById('claim-date')
+
+    time_data.forEach(el => {
+      const li = document.createElement('li')
+      li.innerText = el
+      claimDate.appendChild(li)
+    })
+
+    const orgs = document.querySelector('div[data-step="3"').querySelectorAll('input:checked')
+
+    orgs.forEach(org => {
+        const chosen_org = org.parentElement.querySelector('span.description > div.title').innerText
+        const pasteOrgHere = document.getElementById('summ-org')
+        pasteOrgHere.innerText = `Dla ${chosen_org} w ${city}`
+    })
+  }
+
   const targetButton = document.querySelector('div[data-step="1"]').querySelector('button')
   targetButton.addEventListener("click", hideThemInputs, once=true)
+
+  const showSummaryButton = document.querySelector('div[data-step="4"]').querySelector('button.next-step')
+  showSummaryButton.addEventListener('click', displaySummary)
 
   const form = document.querySelector(".form--steps");
   if (form !== null) {

@@ -2,6 +2,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.utils import tree
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -25,6 +26,10 @@ class Institution(models.Model):
     categories = models.ManyToManyField(Category)
     description = models.TextField()
     type = models.IntegerField(choices=INSTITUTION_CHOICES, default=1)
+
+    class Meta:
+        def __str__(self) -> str:
+            return f"Name: {self.name} <> Categories: {self.categories} <> Description: {self.description} <> Type: {self.type}"
 
 
 class UserManager(BaseUserManager):
@@ -74,14 +79,14 @@ class User(AbstractUser):
 
 
 class Donation(models.Model):
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(null=True)
     categories = models.ManyToManyField(Category)
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
-    address = models.CharField(max_length=256)
-    phone_number = models.IntegerField()
-    city = models.CharField(max_length=128)
-    zip_code = models.CharField(max_length=64)
-    pick_up_date = models.DateTimeField()
-    pick_up_time = models.DateTimeField()
-    pick_up_comment = models.TextField()
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, null=True)
+    address = models.CharField(max_length=256, null=True)
+    phone_number = models.IntegerField(null=True)
+    city = models.CharField(max_length=128, null=True)
+    zip_code = models.CharField(max_length=64, null=True)
+    pick_up_date = models.DateTimeField(null=True)
+    pick_up_time = models.DateTimeField(null=True)
+    pick_up_comment = models.TextField(null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, default=None, on_delete=models.CASCADE)

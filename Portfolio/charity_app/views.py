@@ -70,6 +70,12 @@ class AddDonation(View):
             return redirect('Login')
 
 
+class ConfirmationView(View):
+    
+    def get(self, request):
+        return render(request, 'form-confirmation.html')
+
+
 class Login(View):
 
     def get(self, request):
@@ -142,3 +148,37 @@ class SelectedInstitutionsView(View):
         response = HttpResponse(json.dumps({"idList": idList}))
 
         return response
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SaveDonationView(View):
+    """Creates Donation via AJAX call."""
+    def post(self, request):
+        print(request.user)
+        data = json.loads(request.body)
+        donation = Donation.objects.create()
+        for dataObj in data:
+            print(dataObj['name'] , dataObj['value'])
+            if dataObj['name'] == 'bags':
+                donation.quantity = dataObj['value']
+            if dataObj['name'] == 'categories':
+                donation.categories.add(dataObj['value'])
+            if dataObj['name'] == 'organization':
+                donation.institution = Institution.objects.get(pk=int(dataObj['value'])) 
+            if dataObj['name'] == 'address':
+                donation.address = dataObj['value']
+            if dataObj['name'] == 'phone':
+                donation.phone_number = dataObj['value']
+            if dataObj['name'] == 'city':
+                donation.city = dataObj['value']
+            if dataObj['name'] == 'postcode':
+                donation.zipcode = dataObj['value']
+            if dataObj['name'] == 'date':
+                donation.pick_up_date = dataObj['value']
+            if dataObj['name'] == 'time':
+                donation.time = dataObj['value']
+            if dataObj['name'] == 'more_info':
+                donation.pick_up_comment = dataObj['value']
+        donation.save()
+        print(donation)
+        return JsonResponse("OK", safe=False)

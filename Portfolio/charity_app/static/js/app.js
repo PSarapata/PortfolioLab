@@ -235,7 +235,6 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$stepInstructions[0].parentElement.parentElement.hidden = this.currentStep >= 6;
       this.$step.parentElement.hidden = this.currentStep >= 6;
       document.getElementById('form-donate').scrollIntoView();
-      // TODO: get data from inputs and show them in summary
     }
 
     /**
@@ -244,9 +243,30 @@ document.addEventListener("DOMContentLoaded", function() {
      * TODO: validation, send data to server
      */
   submit(e) {
+    // SEND DATA WITH AJAX HERE
     e.preventDefault();
+    
+    const data = $( ":input" ).serializeArray();
+
+    $.ajax({
+      type: 'POST',
+      url: "/app/ajax/save-donation/",
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
+      data: JSON.stringify(data),
+      success: (resp) => {
+        window.location.href = '/app/donate/confirmation/'
+        $( '#confirmation' ).appendChild('div').innerText = 'Dziękujemy za przesłanie formularza. Na maila prześlemy wszelkie informacje o odbiorze.'
+      },
+      error: (resp) => {
+        console.log("error!", resp)
+        console.log(["responseJSON"]["error"])
+      },
+    })
+
     this.currentStep++;
     this.updateForm()
+
   };
 }
 
@@ -315,18 +335,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const qty = document.querySelector('div[data-step="2"]').querySelector('input').value
     const pasteQtyAndNamesHere = document.getElementById('summ-donation')
-    pasteQtyAndNamesHere.innerText = `${qty} worki ${categoryNames}`
+    pasteQtyAndNamesHere.innerText = `Ilość worków: ${qty}, z kategorii: ${categoryNames}.`
 
     const address = document.querySelector('input[name="address"]').value
     const city = document.querySelector('input[name="city"]').value
     const postcode = document.querySelector('input[name="postcode"]').value
     const phone = document.querySelector('input[name="phone"]').value
-    const address_data = [address, city, postcode, phone]
+    const address_data = {
+      address: address,
+      city: city,
+      postcode: postcode,
+      phone: phone
+    }
     const claimAddress = document.getElementById('claim-address')
 
-    address_data.forEach(el => {
+    Object.keys(address_data).forEach(el => {
+
       const li = document.createElement('li')
-      li.innerText = el
+      li.innerText = address_data[el]
+      li.id = el
       claimAddress.appendChild(li)
     })
 
@@ -347,7 +374,7 @@ document.addEventListener("DOMContentLoaded", function() {
     orgs.forEach(org => {
         const chosen_org = org.parentElement.querySelector('span.description > div.title').innerText
         const pasteOrgHere = document.getElementById('summ-org')
-        pasteOrgHere.innerText = `Dla ${chosen_org} w ${city}`
+        pasteOrgHere.innerText = `Dla: ${chosen_org}, w miejscowości: ${city}`
     })
   }
 

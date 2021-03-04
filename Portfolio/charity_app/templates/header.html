@@ -10,6 +10,9 @@
             <li><a href="#">Profil</a></li>
             <li><a href="#">Moje zbiórki</a></li>
             <li><a href="/app/logout/">Wyloguj</a></li>
+            {% if request.user.is_superuser %}
+            <li><a href="/admin/">panel administracyjny</a></li>
+            {% endif %}
           </ul>
         </li>
         {% endif %}

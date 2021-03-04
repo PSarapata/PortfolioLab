@@ -159,6 +159,10 @@ class SaveDonationView(View):
         donation = Donation.objects.create()
         for dataObj in data:
             print(dataObj['name'] , dataObj['value'])
+            # for field in donation._meta.get_fields():
+            #     if dataObj['name'] == field.name:
+            #         donation.field.name = dataObj['value']
+            # ^ This is unfortunatelly giving me Attribute Error & I'm too tired to fix this so I stick with the simple/stupid solution
             if dataObj['name'] == 'bags':
                 donation.quantity = dataObj['value']
             if dataObj['name'] == 'categories':

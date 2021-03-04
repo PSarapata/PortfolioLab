@@ -256,7 +256,6 @@ document.addEventListener("DOMContentLoaded", function() {
       data: JSON.stringify(data),
       success: (resp) => {
         window.location.href = '/app/donate/confirmation/'
-        $( '#confirmation' ).appendChild('div').innerText = 'Dziękujemy za przesłanie formularza. Na maila prześlemy wszelkie informacje o odbiorze.'
       },
       error: (resp) => {
         console.log("error!", resp)

@@ -1,4 +1,5 @@
-from django.http import HttpResponse, JsonResponse
+from django.db.models.fields.related import ForeignKey
+from django.http import HttpResponse, JsonResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.core import serializers
 from django.urls import reverse
@@ -9,8 +10,9 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django import template
 import json
+import ast
 from charity_app.models import Category, Donation, Institution
-
+from charity_app.forms import DonationForm
 User = get_user_model()
 register = template.Library()
 
@@ -150,39 +152,20 @@ class SelectedInstitutionsView(View):
         return response
 
 
-@method_decorator(csrf_exempt, name='dispatch')
 class SaveDonationView(View):
     """Creates Donation via AJAX call."""
     def post(self, request):
         print(request.user)
-        data = json.loads(request.body)
-        donation = Donation.objects.create()
-        for dataObj in data:
-            print(dataObj['name'] , dataObj['value'])
-            # for field in donation._meta.get_fields():
-            #     if dataObj['name'] == field.name:
-            #         donation.field.name = dataObj['value']
-            # ^ This is unfortunatelly giving me Attribute Error & I'm too tired to fix this so I stick with the simple/stupid solution
-            if dataObj['name'] == 'bags':
-                donation.quantity = dataObj['value']
-            if dataObj['name'] == 'categories':
-                donation.categories.add(dataObj['value'])
-            if dataObj['name'] == 'organization':
-                donation.institution = Institution.objects.get(pk=int(dataObj['value'])) 
-            if dataObj['name'] == 'address':
-                donation.address = dataObj['value']
-            if dataObj['name'] == 'phone':
-                donation.phone_number = dataObj['value']
-            if dataObj['name'] == 'city':
-                donation.city = dataObj['value']
-            if dataObj['name'] == 'postcode':
-                donation.zipcode = dataObj['value']
-            if dataObj['name'] == 'date':
-                donation.pick_up_date = dataObj['value']
-            if dataObj['name'] == 'time':
-                donation.time = dataObj['value']
-            if dataObj['name'] == 'more_info':
-                donation.pick_up_comment = dataObj['value']
-        donation.save()
-        print(donation)
-        return JsonResponse("OK", safe=False)
+        print('Checking body contents...', request.body, type(request.body))
+        qd = QueryDict(request.body.decode(), mutable=True)
+        print(qd)
+        data = dict(qd)
+        print(data)
+        data.pop('csrfmiddlewaretoken')
+        form = DonationForm(**data)
+        if form.is_valid():
+            donation = form.save(commit=False)
+            donation.user = request.user
+            donation.save()
+            print(donation)
+            return JsonResponse("OK", safe=False)

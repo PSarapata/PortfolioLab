@@ -79,7 +79,7 @@ class User(AbstractUser):
 
 
 class Donation(models.Model):
-    quantity = models.IntegerField(null=True)
+    quantity = models.IntegerField(default=0)
     categories = models.ManyToManyField(Category)
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE, null=True)
     address = models.CharField(max_length=256, null=True)

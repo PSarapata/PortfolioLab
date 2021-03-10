@@ -237,6 +237,22 @@ document.addEventListener("DOMContentLoaded", function() {
       document.getElementById('form-donate').scrollIntoView();
     }
 
+    getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+              var cookie = jQuery.trim(cookies[i]);
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+
     /**
      * Submit form
      *
@@ -248,12 +264,36 @@ document.addEventListener("DOMContentLoaded", function() {
     
     const data = $( ":input" ).serializeArray();
 
+    $.ajaxSetup({ 
+      beforeSend: function(xhr, settings) {
+          function getCookie(name) {
+              var cookieValue = null;
+              if (document.cookie && document.cookie != '') {
+                  var cookies = document.cookie.split(';');
+                  for (var i = 0; i < cookies.length; i++) {
+                      var cookie = jQuery.trim(cookies[i]);
+                      // Does this cookie string begin with the name we want?
+                      if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                          break;
+                      }
+                  }
+              }
+              return cookieValue;
+          }
+          if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+              // Only send the token to relative URLs i.e. locally.
+              xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          }
+      } 
+ });
+
     $.ajax({
       type: 'POST',
       url: "/app/ajax/save-donation/",
       dataType: 'json',
       contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify(data),
+      data: data,
       success: (resp) => {
         window.location.href = '/app/donate/confirmation/'
       },
@@ -338,8 +378,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const address = document.querySelector('input[name="address"]').value
     const city = document.querySelector('input[name="city"]').value
-    const postcode = document.querySelector('input[name="postcode"]').value
-    const phone = document.querySelector('input[name="phone"]').value
+    const postcode = document.querySelector('input[name="zip_code"]').value
+    const phone = document.querySelector('input[name="phone_number"]').value
     const address_data = {
       address: address,
       city: city,
@@ -356,9 +396,9 @@ document.addEventListener("DOMContentLoaded", function() {
       claimAddress.appendChild(li)
     })
 
-    const date = document.querySelector('input[name="data"]').value
-    const time = document.querySelector('input[name="time"]').value
-    const more_info = document.querySelector('textarea[name="more_info"]').value
+    const date = document.querySelector('input[name="pick_up_date"]').value
+    const time = document.querySelector('input[name="pick_up_time"]').value
+    const more_info = document.querySelector('textarea[name="pick_up_comment"]').value
     const time_data = [date, time, more_info]
     const claimDate = document.getElementById('claim-date')
 

@@ -156,16 +156,14 @@ class SaveDonationView(View):
     """Creates Donation via AJAX call."""
     def post(self, request):
         print(request.user)
-        print('Checking body contents...', request.body, type(request.body))
-        qd = QueryDict(request.body.decode(), mutable=True)
-        print(qd)
-        data = dict(qd)
-        print(data)
-        data.pop('csrfmiddlewaretoken')
-        form = DonationForm(**data)
+        print('Checking body contents...', request.POST, type(request.POST))
+
+        form = DonationForm(request.POST)
+
         if form.is_valid():
             donation = form.save(commit=False)
             donation.user = request.user
             donation.save()
             print(donation)
             return JsonResponse("OK", safe=False)
+        return JsonResponse("Damn")
